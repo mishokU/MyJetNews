@@ -12,7 +12,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
       - uses: actions/checkout@v1
@@ -24,8 +23,9 @@ jobs:
         run: ./gradlew test
       - name: Build Project
         run: ./gradlew assemble
-      - name: Upload apk
-        uses: actions/upload-artifact@v2.1.4
+
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v2.2.4
         with:
           name: app
           path: app/build/output/apk/debug/app-debug.apk
