@@ -1,64 +1,33 @@
-FROM ubuntu:14.04
+# Т.к. основным инструментом для сборки Android-проектов является Gradle, 
+# и по счастливому стечению обстоятельств есть официальный Docker-образ 
+# мы решили за основу взять именно его с нужной нам версией Gradle
+FROM gradle:5.4.1-jdk8
 
-MAINTAINER Jacek Marchwicki "jacek.marchwicki@gmail.com"
+# Задаем переменные с локальной папкой для Android SDK и 
+# версиями платформы и инструментария
+ENV SDK_URL="https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip" \
+    ANDROID_HOME="/usr/local/android-sdk" \
+    ANDROID_VERSION=31 \
+    ANDROID_BUILD_TOOLS_VERSION=28.0.3
 
-# Install java7
-RUN apt-get update && \
-  apt-get install -y software-properties-common && \
-  add-apt-repository -y ppa:webupd8team/java && \
-  (echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections) && \
-  apt-get update && \
-  apt-get install -y oracle-java7-installer && \
-  apt-get clean && \
-  rm -fr /var/lib/apt/lists/* /tmp/* /var/tmp/*
-ENV JAVA7_HOME /usr/lib/jvm/java-8-oracle
+# Создаем папку, скачиваем туда SDK и распаковываем архив,
+# который после сборки удаляем
+RUN mkdir "$ANDROID_HOME" .android \
+    && cd "$ANDROID_HOME" \
+    && curl -o sdk.zip $SDK_URL \
+    && unzip sdk.zip \
+    && rm sdk.zip \
+# В следующих строчках мы создаем папку и текстовые файлы 
+# с лицензиями. На оф. сайте Android написано что мы 
+# можем копировать эти файлы с машин где вручную эти 
+# лицензии подтвердили и что автоматически 
+# их сгенерировать нельзя
+    && mkdir "$ANDROID_HOME/licenses" || true \
+    && echo "24333f8a63b6825ea9c5514f83c2829b004d1" > "$ANDROID_HOME/licenses/android-sdk-license" \
+    && echo "84831b9409646a918e30573bab4c9c91346d8" > "$ANDROID_HOME/licenses/android-sdk-preview-license"    
 
-# Install java8
-RUN apt-get update && \
-  apt-get install -y software-properties-common && \
-  add-apt-repository -y ppa:webupd8team/java && \
-  (echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections) && \
-  apt-get update && \
-  apt-get install -y oracle-java8-installer && \
-  apt-get clean && \
-  rm -fr /var/lib/apt/lists/* /tmp/* /var/tmp/*
-ENV JAVA8_HOME /usr/lib/jvm/java-8-oracle
-
-# Install Deps
-RUN dpkg --add-architecture i386 && apt-get update && apt-get install -y --force-yes expect git wget libc6-i386 lib32stdc++6 lib32gcc1 lib32ncurses5 lib32z1 python curl libqt5widgets5 && apt-get clean && rm -fr /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-# Copy install tools
-COPY tools /opt/tools
-ENV PATH ${PATH}:/opt/tools
-
-# Install Android SDK
-RUN cd /opt && wget --output-document=android-sdk.tgz --quiet https://dl.google.com/android/android-sdk_r24.4.1-linux.tgz && \
-  tar xzf android-sdk.tgz && \
-  rm -f android-sdk.tgz && \
-  chown -R root.root android-sdk-linux && \
-  /opt/tools/android-accept-licenses.sh "android-sdk-linux/tools/android update sdk --all --no-ui --filter platform-tools,tools" && \
-  /opt/tools/android-accept-licenses.sh "android-sdk-linux/tools/android update sdk --all --no-ui --filter platform-tools,tools,build-tools-22.0.1,build-tools-23.0.3,build-tools-24.0.3,build-tools-25.0.0,build-tools-25.0.1,android-21,android-22,android-23,android-24,android-25,addon-google_apis_x86-google-21,extra-android-support,extra-android-m2repository,extra-google-m2repository,extra-google-google_play_services,sys-img-armeabi-v7a-android-24"
-
-# Setup environment
-ENV ANDROID_HOME /opt/android-sdk-linux
-ENV PATH ${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools
-
-RUN which adb
-RUN which android
-
-# Create emulator
-RUN echo "no" | android create avd \
-                --force \
-                --device "Nexus 5" \
-                --name test \
-                --target android-24 \
-                --abi armeabi-v7a \
-                --skin WVGA800 \
-                --sdcard 512M
-
-# Cleaning
-RUN apt-get clean
-
-# GO to workspace
-RUN mkdir -p /opt/workspace
-WORKDIR /opt/workspace
+# Запускаем обновление SDK и установку build-tools, platform-tools
+RUN $ANDROID_HOME/tools/bin/sdkmanager --update
+RUN $ANDROID_HOME/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" \
+    "platforms;android-${ANDROID_VERSION}" \
+    "platform-tools"

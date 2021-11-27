@@ -27,6 +27,10 @@ subprojects {
         mavenCentral()
     }
 
+    plugins.withId("kotlin-kapt") {
+        kapt.useBuildCache = true
+    }
+
     apply plugin: 'com.diffplug.spotless'
     spotless {
         kotlin {
