@@ -3,7 +3,11 @@ name: Android Build
 # to enable orb usage, you must be using circleci 2.1
 # Declare the orbs you wish to use.
 # Android orb docs are available here:  https://circleci.com/developer/orbs/orb/circleci/android
-on: push
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
 jobs:
   build:
@@ -11,6 +15,7 @@ jobs:
 
     steps:
 
+      - name: Checkout
       - uses: actions/checkout@v1
 
       - name: Set Up JDK
@@ -23,3 +28,9 @@ jobs:
 
       - name: Build Project
         run: ./gradlew assemble
+
+      - name: Upload apk
+        uses: actions/upload-artifact@v2.1.4
+        with:
+          name: app
+          path: app/build/output/apk/debug/app-debug.apk
