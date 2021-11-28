@@ -48,7 +48,7 @@ jobs:
         uses: appleboy/telegram-action@master
         with:
           to: 256969395
-          token: ${{ secrets.JET_NEWS_BOT_TOKEN }}
+          token: 2093978146:AAFxEAOq1taAbyiA_mqH457_tbUPLPtXwug
           message: |
             ${{ github.actor }} created commit:
             Commit message: ${{ github.event.commits[0].message }}
