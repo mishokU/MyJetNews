@@ -22,6 +22,7 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
+    if: ${{ always() }}
     needs: [ setup ]
     steps:
       - name: Build Project
@@ -29,6 +30,7 @@ jobs:
 
   tests:
     runs-on: ubuntu-latest
+    if: ${{ always() }}
     needs: [ setup, build ]
     steps:
       - name: Run Tests
@@ -36,6 +38,7 @@ jobs:
 
   uploadApk:
     runs-on: ubuntu-latest
+    if: ${{ always() }}
     needs: [ setup, build, tests]
     steps:
       - name: Upload a Build Artifact
@@ -46,6 +49,7 @@ jobs:
 
   telegramMessage:
     runs-on: ubuntu-latest
+    if: ${{ always() }}
     needs: [ setup, build, tests, uploadApk]
     steps:
       - name: Send telegram message on push
