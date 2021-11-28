@@ -43,7 +43,7 @@ jobs:
         uses: actions/upload-artifact@v2.2.4
         with:
           name: app
-          path: app/build/output/apk/debug/app-debug.apk
+          path: app/build/outputs/apk/debug/app-debug.apk
 
   telegramMessage:
     runs-on: ubuntu-latest
@@ -53,9 +53,10 @@ jobs:
         uses: appleboy/telegram-action@master
         with:
           to: 256969395
-          token: 2093978146:AAFxEAOq1taAbyiA_mqH457_tbUPLPtXwug
+          token: ${{ secrets.JET_NEWS_BOT_TOKEN }}
           message: |
             ${{ github.actor }} created commit:
             Commit message: ${{ github.event.commits[0].message }}
             Repository: ${{ github.repository }}
             See changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}
+            Apk:
