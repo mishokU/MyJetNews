@@ -10,7 +10,7 @@ on:
     branches: [ master ]
 
 jobs:
-  setup:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -19,26 +19,24 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
-
-  build:
-    runs-on: ubuntu-latest
-    if: ${{ always() }}
-    needs: [ setup ]
-    steps:
       - name: Build Project
         run: ./gradlew assemble
 
   tests:
     runs-on: ubuntu-latest
-    if: ${{ always() }}
-    needs: [ setup, build ]
+    needs: [ build ]
     steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Set Up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
       - name: Run Tests
         run: ./gradlew test
 
   uploadApk:
     runs-on: ubuntu-latest
-    if: ${{ always() }}
     needs: [ setup, build, tests]
     steps:
       - name: Upload a Build Artifact
@@ -49,7 +47,6 @@ jobs:
 
   telegramMessage:
     runs-on: ubuntu-latest
-    if: ${{ always() }}
     needs: [ setup, build, tests, uploadApk]
     steps:
       - name: Send telegram message on push
