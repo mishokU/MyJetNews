@@ -24,6 +24,18 @@ jobs:
         run: ./gradlew test
       - name: Build Project
         run: ./gradlew assemble
+      - name: Send telegram message on push
+          uses: appleboy/telegram-action@master
+          with:
+            to: 2093978146
+            token: 2093978146:AAFxEAOq1taAbyiA_mqH457_tbUPLPtXwug
+            message: |
+              ${{ github.actor }} created commit:
+              Commit message: ${{ github.event.commits[0].message }}
+
+              Repository: ${{ github.repository }}
+
+              See changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}
 
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v2.2.4
