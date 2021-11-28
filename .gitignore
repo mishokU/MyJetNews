@@ -9,8 +9,8 @@
 /.idea/assetWizardSettings.xml
 .DS_Store
 /build
+!build/outputs/apk/debug
 /captures
-/build-cache
 .externalNativeBuild
 .cxx
 local.properties
