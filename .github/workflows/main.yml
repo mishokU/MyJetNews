@@ -22,6 +22,15 @@ jobs:
       - name: Build Project
         run: ./gradlew assemble
 
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
       - name: Run Tests
         run: ./gradlew test
 
@@ -38,7 +47,7 @@ jobs:
       - name: Send telegram message on push
         uses: appleboy/telegram-action@master
         with:
-          to: ${{ secrets.CHAT_TOKEN }}
+          to: 256969395
           token: ${{ secrets.JET_NEWS_BOT_TOKEN }}
           message: |
             ${{ github.actor }} created commit:
