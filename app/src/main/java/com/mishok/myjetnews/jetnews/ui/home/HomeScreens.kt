@@ -689,7 +689,7 @@ private fun HomeTopAppBar(
             Icon(
                 painter = painterResource(R.drawable.ic_jetnews_wordmark),
                 contentDescription = title,
-                tint = MaterialTheme.colors.onBackground,
+                tint = MaterialTheme.colors.primary,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(bottom = 4.dp, top = 10.dp)
