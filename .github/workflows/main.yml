@@ -1,8 +1,5 @@
 name: Android Build
 
-# to enable orb usage, you must be using circleci 2.1
-# Declare the orbs you wish to use.
-# Android orb docs are available here:  https://circleci.com/developer/orbs/orb/circleci/android
 on:
   push:
     branches: [ master ]
